@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+<meta name="theme-color" content="#171a1f">
+<title>Agros Maintenance Warrior</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#171a1f;color:#f5f5f5}
+.wrap{max-width:900px;margin:auto;padding:10px}
+h1{text-align:center;font-size:23px;margin:4px 0 2px}
+.subtitle{text-align:center;color:#b9c1ca;font-size:13px;margin:0 0 10px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:9px}
+.stat{background:#252b33;padding:9px;border-radius:10px;text-align:center;font-size:14px}
+.stat b{display:block;font-size:17px;margin-top:2px}
+#game{background:#d7d9dc;border:3px solid #444;border-radius:14px;overflow:hidden}
+svg{width:100%;height:auto;display:block;touch-action:manipulation}
+#msg{background:#252b33;border-radius:10px;padding:11px;margin-top:9px;min-height:50px;line-height:1.35;font-size:14px}
+.controls{display:grid;grid-template-columns:repeat(3,72px);gap:7px;justify-content:center;margin-top:10px}
+.controls button,.actions button{min-height:54px;border:0;border-radius:11px;font-size:18px;font-weight:bold;cursor:pointer;touch-action:manipulation}
+.controls button{background:#e9edf1;color:#20252b}
+#action{background:#f1c40f;color:#171717;font-size:13px}
+#action:disabled{opacity:.45}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+#coffeeBtn{background:#795548;color:#fff}
+#faultBtn{background:#9a3535;color:#fff}
+#restart{background:#4d5969;color:#fff;grid-column:1/-1}
+.hint{text-align:center;font-size:12px;color:#aeb7c1;margin-top:8px}
+@media(max-width:600px){
+  .stats{grid-template-columns:1fr 1fr}
+  h1{font-size:20px}
+  .wrap{padding:7px}
+  .controls{grid-template-columns:repeat(3,68px)}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>🔧 AGROS MAINTENANCE WARRIOR</h1>
+<div class="subtitle">„Jak wszystko działa, to znaczy, że zaraz przestanie.”</div>
+
+<div class="stats">
+  <div class="stat">💰 Kasa<b id="money">0 €</b></div>
+  <div class="stat">⭐ Doświadczenie<b id="xp">0 XP</b></div>
+  <div class="stat">☕ Kawa<b id="coffee">2</b></div>
+  <div class="stat">😤 Cierpliwość<b id="patience">100%</b></div>
+</div>
+
+<div id="game">
+<svg viewBox="0 0 720 470" aria-label="Hala pakowania sałat">
+<defs>
+  <pattern id="floor" width="24" height="24" patternUnits="userSpaceOnUse">
+    <rect width="24" height="24" fill="#d7d9dc"/>
+    <path d="M24 0H0V24" fill="none" stroke="#c7c9cc"/>
+  </pattern>
+</defs>
+<rect width="720" height="470" fill="url(#floor)"/>
+<rect x="10" y="10" width="700" height="450" rx="14" fill="none" stroke="#555" stroke-width="3"/>
+<text x="25" y="36" font-size="18" font-weight="700" fill="#333">HALA PAKOWANIA SAŁAT 🥬</text>
+
+<g id="machines"></g>
+
+<g id="workshop">
+  <rect x="520" y="335" width="165" height="100" rx="10" fill="#8d7b68" stroke="#5d5146" stroke-width="3"/>
+  <text x="603" y="358" text-anchor="middle" font-size="16" font-weight="700" fill="#fff">WARSZTAT</text>
+  <text x="603" y="389" text-anchor="middle" font-size="29">🧰 🔧 ☕</text>
+  <text x="603" y="416" text-anchor="middle" font-size="11" fill="#fff">„Może dziś będzie spokojnie”</text>
+</g>
+
+<g id="forkZone">
+  <text x="58" y="418" font-size="35">🚜</text>
+  <text x="98" y="414" font-size="12" fill="#333">strefa wózków</text>
+</g>
+
+<g id="player" transform="translate(585 300)">
+  <circle cx="0" cy="0" r="20" fill="#f0c38e" stroke="#333" stroke-width="2"/>
+  <circle cx="-7" cy="-4" r="2.6" fill="#222"/>
+  <circle cx="7" cy="-4" r="2.6" fill="#222"/>
+  <path d="M-7 7 Q0 10 7 7" fill="none" stroke="#333" stroke-width="2"/>
+  <rect x="-20" y="19" width="40" height="29" rx="11" fill="#455a64" stroke="#333" stroke-width="2"/>
+  <ellipse cx="0" cy="39" rx="24" ry="15" fill="#5d4037"/>
+  <text x="0" y="69" text-anchor="middle" font-size="11" font-weight="700" fill="#222">MECHANIK</text>
+</g>
+
+<g id="boss" visibility="hidden">
+  <text x="665" y="75" text-anchor="middle" font-size="43">😡</text>
+  <text x="665" y="98" text-anchor="middle" font-size="11" font-weight="700" fill="#8b0000">PREZES</text>
+</g>
+</svg>
+</div>
+
+<div id="msg">🕕 Zmiana rozpoczęta. Na razie podejrzanie spokojnie.</div>
+
+<div class="controls">
+  <span></span><button type="button" data-dir="up">▲</button><span></span>
+  <button type="button" data-dir="left">◀</button><button type="button" id="action" disabled>NAPRAW</button><button type="button" data-dir="right">▶</button>
+  <span></span><button type="button" data-dir="down">▼</button><span></span>
+</div>
+
+<div class="actions">
+  <button type="button" id="coffeeBtn">☕ Kawa</button>
+  <button type="button" id="faultBtn">🚨 Test awarii</button>
+  <button type="button" id="restart">🔄 Nowa zmiana</button>
+</div>
+
+<div class="hint">PC: strzałki / WASD • Spacja = naprawa. Telefon: użyj przycisków ▲ ◀ ▶ ▼.</div>
+</div>
+
+<script>
+(function(){
+const defs=[
+{id:'ulma',name:'ULMA',x:55,y:70,w:155,h:78},
+{id:'redpack',name:'Redpack',x:280,y:70,w:155,h:78},
+{id:'belca',name:'Belca',x:55,y:205,w:155,h:78},
+{id:'maripack',name:'Maripack',x:280,y:205,w:155,h:78},
+{id:'detector',name:'Detektor metalu',x:510,y:90,w:155,h:68},
+{id:'gate',name:'Brama nr 3',x:510,y:210,w:155,h:68}
+];
+
+const faultTexts={
+ulma:['Nie jedzie. Ktoś nie wcisnął START.','Nie zgrzewa. Folia poszła krzywo.','Fotokomórka dostała sałatą.'],
+redpack:['Produkcja stoi! Otwarta osłona.','Folia idzie bokiem.','Operator: „ja nic nie dotykałem”.'],
+belca:['Grzybek E-STOP wciśnięty od 20 minut.','Temperatura zgrzewu z kosmosu.','Maszyna nie rusza, bo po prostu nie.'],
+maripack:['Ktoś zmienił parametry. Oczywiście nikt.','Dziwnie pika.','Czujnik brudny.'],
+detector:['Test niepotwierdzony.','Alarm detektora.','Nie przepuszcza produktu.'],
+gate:['Wózek znowu wygrał z bramą.','Prowadnica wygląda jak harmonijka.','Kierowca twierdzi, że brama sama wyskoczyła.']
+};
+
+const repairs=[
+'Operator: „Wiedziałem, że to drobiazg.”',
+'Mechanik patrzy na operatora. Operator patrzy w podłogę.',
+'Naprawione. Można wrócić do kawy. Żart.',
+'Mechanik westchnął tak mocno, że ruszyła wentylacja.',
+'Poważna awaria. Pomogło wciśnięcie START.'
+];
+
+const bossLines=[
+'„Dlaczego to jeszcze nie działa?”',
+'„Ile to potrwa?”',
+'„A ta druga maszyna?”',
+'„Produkcja czeka.”',
+'„Można to zrobić szybciej?”'
+];
+
+const machinesG=document.getElementById('machines');
+const player=document.getElementById('player');
+const boss=document.getElementById('boss');
+const msg=document.getElementById('msg');
+const action=document.getElementById('action');
+
+let state;
+let faultTimer=null;
+let bossTimer=null;
+
+defs.forEach(m=>{
+  const g=document.createElementNS('http://www.w3.org/2000/svg','g');
+  g.dataset.id=m.id;
+  const r=document.createElementNS('http://www.w3.org/2000/svg','rect');
+  r.setAttribute('x',m.x); r.setAttribute('y',m.y); r.setAttribute('width',m.w); r.setAttribute('height',m.h);
+  r.setAttribute('rx','10'); r.setAttribute('fill','#74808b'); r.setAttribute('stroke','#46515c'); r.setAttribute('stroke-width','3');
+  const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+  t.setAttribute('x',m.x+m.w/2); t.setAttribute('y',m.y+33); t.setAttribute('text-anchor','middle');
+  t.setAttribute('font-size','16'); t.setAttribute('font-weight','700'); t.setAttribute('fill','#fff'); t.textContent=m.name;
+  const s=document.createElementNS('http://www.w3.org/2000/svg','text');
+  s.setAttribute('x',m.x+m.w/2); s.setAttribute('y',m.y+57); s.setAttribute('text-anchor','middle');
+  s.setAttribute('font-size','12'); s.setAttribute('fill','#effff0'); s.dataset.status='1'; s.textContent='✅ działa';
+  g.append(r,t,s); machinesG.appendChild(g);
+});
+
+function updateStats(){
+  document.getElementById('money').textContent=state.money+' €';
+  document.getElementById('xp').textContent=state.xp+' XP';
+  document.getElementById('coffee').textContent=state.coffee;
+  document.getElementById('patience').textContent=state.patience+'%';
+}
+
+function updateMachines(){
+  defs.forEach(m=>{
+    const g=machinesG.querySelector('[data-id="'+m.id+'"]');
+    const down=state.machines[m.id].down;
+    const r=g.querySelector('rect');
+    const s=g.querySelector('[data-status]');
+    r.setAttribute('fill',down?'#a33f3f':'#74808b');
+    r.setAttribute('stroke',down?'#761616':'#46515c');
+    s.textContent=down?'🚨 AWARIA':'✅ działa';
+    s.setAttribute('fill',down?'#fff0a8':'#effff0');
+  });
+  updateAction();
+}
+
+function updatePlayer(){
+  player.setAttribute('transform','translate('+state.x+' '+state.y+')');
+  updateAction();
+}
+
+function nearestBroken(){
+  let best=null,bestD=Infinity;
+  defs.forEach(m=>{
+    if(!state.machines[m.id].down) return;
+    const d=Math.hypot(state.x-(m.x+m.w/2),state.y-(m.y+m.h/2));
+    if(d<bestD){bestD=d;best=m;}
+  });
+  return bestD<115?best:null;
+}
+
+function updateAction(){
+  const m=nearestBroken();
+  action.disabled=!m;
+  action.textContent=m?'🔧 '+m.name:'NAPRAW';
+}
+
+function downCount(){
+  return defs.filter(m=>state.machines[m.id].down).length;
+}
+
+function spawnFault(){
+  const free=defs.filter(m=>!state.machines[m.id].down);
+  if(!free.length){
+    msg.textContent='☠️ Wszystko stoi. Prezes już wie.';
+    return;
+  }
+  const m=free[Math.floor(Math.random()*free.length)];
+  const opts=faultTexts[m.id];
+  state.machines[m.id].down=true;
+  state.machines[m.id].fault=opts[Math.floor(Math.random()*opts.length)];
+  state.patience=Math.max(0,state.patience-3);
+  msg.textContent='📞 '+m.name+': '+state.machines[m.id].fault;
+  updateMachines(); updateStats();
+
+  if(downCount()>=3 && !state.boss && Math.random()<0.8){
+    state.boss=true;
+    boss.setAttribute('visibility','visible');
+    state.patience=Math.max(0,state.patience-8);
+    msg.textContent+=' 😡 PREZES: '+bossLines[Math.floor(Math.random()*bossLines.length)];
+    updateStats();
+  }
+}
+
+function repair(){
+  const m=nearestBroken();
+  if(!m){
+    msg.textContent='🔧 Podejdź bliżej do czerwonej maszyny.';
+    return;
+  }
+  const oldFault=state.machines[m.id].fault;
+  state.machines[m.id].down=false;
+  state.machines[m.id].fault='';
+  const reward=35+Math.floor(Math.random()*31);
+  state.money+=reward;
+  state.xp+=10;
+  state.patience=Math.max(0,state.patience-(state.boss?7:4));
+  msg.textContent='🔧 '+m.name+' naprawiona. '+oldFault+' '+repairs[Math.floor(Math.random()*repairs.length)]+' +'+reward+' € / +10 XP';
+
+  if(state.boss && downCount()<=1){
+    state.boss=false;
+    boss.setAttribute('visibility','hidden');
+    msg.textContent+=' 👔 Prezes poszedł denerwować kogoś innego.';
+  }
+  updateMachines(); updateStats();
+}
+
+function collides(nx,ny){
+  const r=18;
+  if(nx<25||nx>695||ny<48||ny>440) return true;
+  for(const m of defs){
+    if(nx+r>m.x&&nx-r<m.x+m.w&&ny+r>m.y&&ny-r<m.y+m.h) return true;
+  }
+  if(nx+r>520&&nx-r<685&&ny+r>335&&ny-r<435) return true;
+  return false;
+}
+
+function move(dx,dy){
+  const step=17;
+  const nx=state.x+dx*step;
+  const ny=state.y+dy*step;
+  if(!collides(nx,ny)){
+    state.x=nx; state.y=ny; updatePlayer();
+  }
+}
+
+function drinkCoffee(){
+  if(state.coffee<=0){
+    msg.textContent='☕ Kawa się skończyła. To nie jest już gra, tylko dokument.';
+    return;
+  }
+  state.coffee--;
+  state.patience=Math.min(100,state.patience+25);
+  updateStats();
+  msg.textContent='☕ Kawa +25 cierpliwości. Błogi spokój...';
+  if(Math.random()<0.65){
+    setTimeout(()=>{msg.textContent='📞 DRRRRYŃ. Oczywiście dokładnie teraz.';spawnFault();},800);
+  }
+}
+
+function reset(){
+  if(faultTimer) clearInterval(faultTimer);
+  if(bossTimer) clearInterval(bossTimer);
+  state={x:585,y:300,money:0,xp:0,coffee:2,patience:100,boss:false,machines:{}};
+  defs.forEach(m=>state.machines[m.id]={down:false,fault:''});
+  boss.setAttribute('visibility','hidden');
+  updatePlayer(); updateMachines(); updateStats();
+  msg.textContent='🕕 Nowa zmiana. Mechanik jeszcze ma nadzieję.';
+  faultTimer=setInterval(spawnFault,5500);
+  bossTimer=setInterval(()=>{if(state.boss){state.patience=Math.max(0,state.patience-1);updateStats();}},1800);
+  setTimeout(spawnFault,1000);
+  setTimeout(spawnFault,3400);
+}
+
+document.querySelectorAll('[data-dir]').forEach(btn=>{
+  const dirs={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]};
+  btn.addEventListener('click',()=>{const d=dirs[btn.dataset.dir];move(d[0],d[1]);});
+});
+
+document.addEventListener('keydown',e=>{
+  const k=e.key.toLowerCase();
+  const map={arrowup:[0,-1],w:[0,-1],arrowdown:[0,1],s:[0,1],arrowleft:[-1,0],a:[-1,0],arrowright:[1,0],d:[1,0]};
+  if(map[k]){e.preventDefault();move(map[k][0],map[k][1]);}
+  if(k===' '||k==='enter'){e.preventDefault();repair();}
+});
+
+action.addEventListener('click',repair);
+document.getElementById('coffeeBtn').addEventListener('click',drinkCoffee);
+document.getElementById('faultBtn').addEventListener('click',spawnFault);
+document.getElementById('restart').addEventListener('click',reset);
+
+reset();
+})();
+</script>
+</body>
+</html>
