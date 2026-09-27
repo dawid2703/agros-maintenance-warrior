@@ -4,327 +4,501 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
 <meta name="theme-color" content="#171a1f">
-<title>Agros Maintenance Warrior</title>
+<title>Agros Maintenance Warrior — Concept Demo</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#171a1f;color:#f5f5f5}
-.wrap{max-width:900px;margin:auto;padding:10px}
-h1{text-align:center;font-size:23px;margin:4px 0 2px}
-.subtitle{text-align:center;color:#b9c1ca;font-size:13px;margin:0 0 10px}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:9px}
-.stat{background:#252b33;padding:9px;border-radius:10px;text-align:center;font-size:14px}
-.stat b{display:block;font-size:17px;margin-top:2px}
-#game{background:#d7d9dc;border:3px solid #444;border-radius:14px;overflow:hidden}
-svg{width:100%;height:auto;display:block;touch-action:manipulation}
-#msg{background:#252b33;border-radius:10px;padding:11px;margin-top:9px;min-height:50px;line-height:1.35;font-size:14px}
-.controls{display:grid;grid-template-columns:repeat(3,72px);gap:7px;justify-content:center;margin-top:10px}
-.controls button,.actions button{min-height:54px;border:0;border-radius:11px;font-size:18px;font-weight:bold;cursor:pointer;touch-action:manipulation}
-.controls button{background:#e9edf1;color:#20252b}
-#action{background:#f1c40f;color:#171717;font-size:13px}
-#action:disabled{opacity:.45}
-.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
-#coffeeBtn{background:#795548;color:#fff}
-#faultBtn{background:#9a3535;color:#fff}
-#restart{background:#4d5969;color:#fff;grid-column:1/-1}
-.hint{text-align:center;font-size:12px;color:#aeb7c1;margin-top:8px}
-@media(max-width:600px){
-  .stats{grid-template-columns:1fr 1fr}
-  h1{font-size:20px}
-  .wrap{padding:7px}
-  .controls{grid-template-columns:repeat(3,68px)}
+body{margin:0;background:#171a1f;color:#f5f5f5;font-family:Arial,Helvetica,sans-serif}
+.wrap{max-width:1100px;margin:auto;padding:10px}
+h1{text-align:center;font-size:22px;margin:4px 0}
+.sub{text-align:center;color:#b8c0ca;font-size:13px;margin:2px 0 9px}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:8px}
+.stat{background:#252b33;border-radius:9px;padding:8px;text-align:center;font-size:12px}
+.stat b{display:block;font-size:16px;margin-top:2px}
+.gamebox{position:relative;border:3px solid #414851;border-radius:13px;overflow:hidden;background:#0f1114}
+canvas{display:block;width:100%;height:auto;background:#bfc3c6;touch-action:none}
+.badge{position:absolute;left:8px;top:8px;background:rgba(20,23,28,.86);padding:6px 8px;border-radius:8px;font-size:12px;pointer-events:none}
+#bubble{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);width:min(92%,720px);background:rgba(24,27,32,.94);border:1px solid #5b6570;border-radius:10px;padding:9px 12px;font-size:13px;line-height:1.35;min-height:38px}
+.controls{display:grid;grid-template-columns:230px 1fr;gap:10px;margin-top:9px;align-items:start}
+.dpad{display:grid;grid-template-columns:repeat(3,68px);gap:6px;justify-content:center}
+.dpad button,.actions button{min-height:52px;border:0;border-radius:10px;font-weight:bold;font-size:17px;touch-action:manipulation;cursor:pointer}
+.dpad button{background:#eef1f3;color:#222}
+#interact{background:#f1c40f;color:#1b1b1b;font-size:13px}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.actions button{background:#4d5968;color:#fff;font-size:14px}
+.actions #coffee{background:#795548}
+.actions #fault{background:#8f3939}
+.actions #reset{grid-column:1/-1}
+.legend{font-size:12px;color:#aeb7c1;line-height:1.45;margin-top:8px}
+@media(max-width:720px){
+  .stats{grid-template-columns:repeat(3,1fr)}
+  .controls{grid-template-columns:1fr}
+  .dpad{grid-template-columns:repeat(3,64px)}
+  h1{font-size:19px}
+  .wrap{padding:6px}
 }
 </style>
 </head>
 <body>
 <div class="wrap">
-<h1>🔧 AGROS MAINTENANCE WARRIOR</h1>
-<div class="subtitle">„Jak wszystko działa, to znaczy, że zaraz przestanie.”</div>
+  <h1>🔧 AGROS MAINTENANCE WARRIOR</h1>
+  <div class="sub">Concept Demo 0.3 — duży zakład, 4 hale, operatorzy, Prezes i spokojniejsze tempo</div>
 
-<div class="stats">
-  <div class="stat">💰 Kasa<b id="money">0 €</b></div>
-  <div class="stat">⭐ Doświadczenie<b id="xp">0 XP</b></div>
-  <div class="stat">☕ Kawa<b id="coffee">2</b></div>
-  <div class="stat">😤 Cierpliwość<b id="patience">100%</b></div>
-</div>
+  <div class="stats">
+    <div class="stat">💰 Kasa<b id="money">0 €</b></div>
+    <div class="stat">⭐ XP<b id="xp">0</b></div>
+    <div class="stat">😤 Cierpliwość<b id="patience">100%</b></div>
+    <div class="stat">☕ Kawa<b id="coffees">3</b></div>
+    <div class="stat">🚨 Awarie<b id="faults">0</b></div>
+  </div>
 
-<div id="game">
-<svg viewBox="0 0 720 470" aria-label="Hala pakowania sałat">
-<defs>
-  <pattern id="floor" width="24" height="24" patternUnits="userSpaceOnUse">
-    <rect width="24" height="24" fill="#d7d9dc"/>
-    <path d="M24 0H0V24" fill="none" stroke="#c7c9cc"/>
-  </pattern>
-</defs>
-<rect width="720" height="470" fill="url(#floor)"/>
-<rect x="10" y="10" width="700" height="450" rx="14" fill="none" stroke="#555" stroke-width="3"/>
-<text x="25" y="36" font-size="18" font-weight="700" fill="#333">HALA PAKOWANIA SAŁAT 🥬</text>
+  <div class="gamebox">
+    <canvas id="game" width="960" height="600" aria-label="Duża mapa zakładu AGROS"></canvas>
+    <div class="badge" id="zone">📍 WARSZTAT</div>
+    <div id="bubble">🕕 Zmiana rozpoczęta. Rozejrzyj się po zakładzie.</div>
+  </div>
 
-<g id="machines"></g>
-
-<g id="workshop">
-  <rect x="520" y="335" width="165" height="100" rx="10" fill="#8d7b68" stroke="#5d5146" stroke-width="3"/>
-  <text x="603" y="358" text-anchor="middle" font-size="16" font-weight="700" fill="#fff">WARSZTAT</text>
-  <text x="603" y="389" text-anchor="middle" font-size="29">🧰 🔧 ☕</text>
-  <text x="603" y="416" text-anchor="middle" font-size="11" fill="#fff">„Może dziś będzie spokojnie”</text>
-</g>
-
-<g id="forkZone">
-  <text x="58" y="418" font-size="35">🚜</text>
-  <text x="98" y="414" font-size="12" fill="#333">strefa wózków</text>
-</g>
-
-<g id="player" transform="translate(585 300)">
-  <circle cx="0" cy="0" r="20" fill="#f0c38e" stroke="#333" stroke-width="2"/>
-  <circle cx="-7" cy="-4" r="2.6" fill="#222"/>
-  <circle cx="7" cy="-4" r="2.6" fill="#222"/>
-  <path d="M-7 7 Q0 10 7 7" fill="none" stroke="#333" stroke-width="2"/>
-  <rect x="-20" y="19" width="40" height="29" rx="11" fill="#455a64" stroke="#333" stroke-width="2"/>
-  <ellipse cx="0" cy="39" rx="24" ry="15" fill="#5d4037"/>
-  <text x="0" y="69" text-anchor="middle" font-size="11" font-weight="700" fill="#222">MECHANIK</text>
-</g>
-
-<g id="boss" visibility="hidden">
-  <text x="665" y="75" text-anchor="middle" font-size="43">😡</text>
-  <text x="665" y="98" text-anchor="middle" font-size="11" font-weight="700" fill="#8b0000">PREZES</text>
-</g>
-</svg>
-</div>
-
-<div id="msg">🕕 Zmiana rozpoczęta. Na razie podejrzanie spokojnie.</div>
-
-<div class="controls">
-  <span></span><button type="button" data-dir="up">▲</button><span></span>
-  <button type="button" data-dir="left">◀</button><button type="button" id="action" disabled>NAPRAW</button><button type="button" data-dir="right">▶</button>
-  <span></span><button type="button" data-dir="down">▼</button><span></span>
-</div>
-
-<div class="actions">
-  <button type="button" id="coffeeBtn">☕ Kawa</button>
-  <button type="button" id="faultBtn">🚨 Test awarii</button>
-  <button type="button" id="restart">🔄 Nowa zmiana</button>
-</div>
-
-<div class="hint">PC: strzałki / WASD • Spacja = naprawa. Telefon: użyj przycisków ▲ ◀ ▶ ▼.</div>
+  <div class="controls">
+    <div class="dpad">
+      <span></span><button type="button" data-dir="up">▲</button><span></span>
+      <button type="button" data-dir="left">◀</button><button type="button" id="interact">AKCJA</button><button type="button" data-dir="right">▶</button>
+      <span></span><button type="button" data-dir="down">▼</button><span></span>
+    </div>
+    <div>
+      <div class="actions">
+        <button type="button" id="coffee">☕ Wypij kawę</button>
+        <button type="button" id="fault">🚨 Test awarii</button>
+        <button type="button" id="reset">🔄 Nowa zmiana</button>
+      </div>
+      <div class="legend">
+        PC: WASD / strzałki • Spacja / Enter = akcja. Telefon: przyciski kierunkowe.<br>
+        Awarii jest mało. Masz czas dojść do hali, pogadać z operatorem i obejrzeć maszynę.
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
-(function(){
-const defs=[
-{id:'ulma',name:'ULMA',x:55,y:70,w:155,h:78},
-{id:'redpack',name:'Redpack',x:280,y:70,w:155,h:78},
-{id:'belca',name:'Belca',x:55,y:205,w:155,h:78},
-{id:'maripack',name:'Maripack',x:280,y:205,w:155,h:78},
-{id:'detector',name:'Detektor metalu',x:510,y:90,w:155,h:68},
-{id:'gate',name:'Brama nr 3',x:510,y:210,w:155,h:68}
+(()=> {
+'use strict';
+const canvas=document.getElementById('game');
+const ctx=canvas.getContext('2d');
+const bubble=document.getElementById('bubble');
+const zoneEl=document.getElementById('zone');
+const interactBtn=document.getElementById('interact');
+
+const WORLD={w:3200,h:2400};
+const workshop={x:1370,y:1010,w:460,h:380,name:'WARSZTAT'};
+
+const halls=[
+  {id:'kapusta',name:'HALA KAPUSTA',x:920,y:120,w:1360,h:650,fill:'#879d82',accent:'#53694f'},
+  {id:'rzodkiewka',name:'HALA RZODKIEWKA',x:120,y:760,w:940,h:910,fill:'#b18f96',accent:'#744f58'},
+  {id:'brokul',name:'HALA BROKUŁ',x:2140,y:760,w:940,h:910,fill:'#718a78',accent:'#3f5c47'},
+  {id:'cebula',name:'HALA CEBULA',x:920,y:1740,w:1360,h:540,fill:'#aa9876',accent:'#756244'}
 ];
 
-const faultTexts={
-ulma:['Nie jedzie. Ktoś nie wcisnął START.','Nie zgrzewa. Folia poszła krzywo.','Fotokomórka dostała sałatą.'],
-redpack:['Produkcja stoi! Otwarta osłona.','Folia idzie bokiem.','Operator: „ja nic nie dotykałem”.'],
-belca:['Grzybek E-STOP wciśnięty od 20 minut.','Temperatura zgrzewu z kosmosu.','Maszyna nie rusza, bo po prostu nie.'],
-maripack:['Ktoś zmienił parametry. Oczywiście nikt.','Dziwnie pika.','Czujnik brudny.'],
-detector:['Test niepotwierdzony.','Alarm detektora.','Nie przepuszcza produktu.'],
-gate:['Wózek znowu wygrał z bramą.','Prowadnica wygląda jak harmonijka.','Kierowca twierdzi, że brama sama wyskoczyła.']
+const machineTemplates={
+  kapusta:['ULMA K1','ULMA K2','Redpack K3','Redpack K4','Waga K5','Detektor K6','Etykieciarka K7','Taśma K8'],
+  rzodkiewka:['Belca R1','Belca R2','Flowpack R3','Etykieciarka R4','Taśma R5','Zgrzewarka R6','Waga R7','Podajnik R8'],
+  brokul:['Maripack B1','Maripack B2','ULMA B3','Waga B4','Detektor B5','Podajnik B6','Taśma B7','Drukarka B8'],
+  cebula:['Redpack C1','Belca C2','Flowpack C3','Owijarka C4','Taśma C5','Brama C6','Podajnik C7','Detektor C8']
 };
 
-const repairs=[
-'Operator: „Wiedziałem, że to drobiazg.”',
-'Mechanik patrzy na operatora. Operator patrzy w podłogę.',
-'Naprawione. Można wrócić do kawy. Żart.',
-'Mechanik westchnął tak mocno, że ruszyła wentylacja.',
-'Poważna awaria. Pomogło wciśnięcie START.'
+const faultTexts=[
+  'Nie jedzie. Operator twierdzi, że „jeszcze przed chwilą było dobrze”.',
+  'Nie zgrzewa. Temperatura wygląda podejrzanie.',
+  'Fotokomórka nie widzi produktu.',
+  'Folia idzie bokiem.',
+  'E-STOP wciśnięty. Oczywiście nikt nie wie przez kogo.',
+  'Czujnik zasłonięty kawałkiem produktu.',
+  'Alarm osłony bezpieczeństwa.',
+  'Taśma stoi i wydaje dźwięk, którego nikt nie lubi.',
+  'Etykiety wychodzą jak chcą.',
+  'Pneumatyka syczy tam, gdzie raczej nie powinna.'
 ];
-
+const operatorLines=[
+  '„Ja nic nie dotykałem.”',
+  '„Samo stanęło.”',
+  '„Możesz tylko szybko zerknąć?”',
+  '„Przed chwilą działało.”',
+  '„Kierownik mówił, żeby zadzwonić po warsztat.”',
+  '„Nie wiem co się stało. Nagle przestało.”'
+];
 const bossLines=[
-'„Dlaczego to jeszcze nie działa?”',
-'„Ile to potrwa?”',
-'„A ta druga maszyna?”',
-'„Produkcja czeka.”',
-'„Można to zrobić szybciej?”'
+  '„Ile to jeszcze potrwa?”',
+  '„Dlaczego stoją dwie linie?”',
+  '„Produkcja czeka.”',
+  '„Można to zrobić szybciej?”',
+  '„A ta druga maszyna?”'
 ];
 
-const machinesG=document.getElementById('machines');
-const player=document.getElementById('player');
-const boss=document.getElementById('boss');
-const msg=document.getElementById('msg');
-const action=document.getElementById('action');
-
+let machines=[];
+let operators=[];
+let forklifts=[];
 let state;
-let faultTimer=null;
-let bossTimer=null;
+let faultClock=0;
+let nextFault=28;
+let last=performance.now();
+let keys={};
 
-defs.forEach(m=>{
-  const g=document.createElementNS('http://www.w3.org/2000/svg','g');
-  g.dataset.id=m.id;
-  const r=document.createElementNS('http://www.w3.org/2000/svg','rect');
-  r.setAttribute('x',m.x); r.setAttribute('y',m.y); r.setAttribute('width',m.w); r.setAttribute('height',m.h);
-  r.setAttribute('rx','10'); r.setAttribute('fill','#74808b'); r.setAttribute('stroke','#46515c'); r.setAttribute('stroke-width','3');
-  const t=document.createElementNS('http://www.w3.org/2000/svg','text');
-  t.setAttribute('x',m.x+m.w/2); t.setAttribute('y',m.y+33); t.setAttribute('text-anchor','middle');
-  t.setAttribute('font-size','16'); t.setAttribute('font-weight','700'); t.setAttribute('fill','#fff'); t.textContent=m.name;
-  const s=document.createElementNS('http://www.w3.org/2000/svg','text');
-  s.setAttribute('x',m.x+m.w/2); s.setAttribute('y',m.y+57); s.setAttribute('text-anchor','middle');
-  s.setAttribute('font-size','12'); s.setAttribute('fill','#effff0'); s.dataset.status='1'; s.textContent='✅ działa';
-  g.append(r,t,s); machinesG.appendChild(g);
-});
+function buildWorld(){
+  machines=[];
+  operators=[];
+  const layouts={
+    kapusta:[[1060,250],[1390,250],[1720,250],[2050,250],[1060,520],[1390,520],[1720,520],[2050,520]],
+    rzodkiewka:[[260,900],[650,900],[260,1160],[650,1160],[260,1420],[650,1420],[840,900],[840,1420]],
+    brokul:[[2280,900],[2670,900],[2280,1160],[2670,1160],[2280,1420],[2670,1420],[2460,900],[2460,1420]],
+    cebula:[[1060,1845],[1390,1845],[1720,1845],[2050,1845],[1060,2080],[1390,2080],[1720,2080],[2050,2080]]
+  };
+  halls.forEach(h=>{
+    const names=machineTemplates[h.id];
+    layouts[h.id].forEach((p,i)=>{
+      const m={id:h.id+i,hall:h.id,name:names[i],x:p[0],y:p[1],w:210,h:92,down:false,fault:'',stage:0};
+      machines.push(m);
+      operators.push({
+        id:'op-'+m.id,
+        machineId:m.id,
+        x:p[0]-38,
+        y:p[1]+48,
+        homeX:p[0]-38,
+        homeY:p[1]+48,
+        mood:i%3,
+        facing:1
+      });
+    });
+  });
+  forklifts=[
+    {x:1180,y:850,vx:35,vy:0,min:1100,max:2080,axis:'x'},
+    {x:520,y:1770,vx:0,vy:30,min:1710,max:2210,axis:'y'},
+    {x:2520,y:1780,vx:0,vy:-28,min:1720,max:2210,axis:'y'}
+  ];
+}
 
-function updateStats(){
+function reset(){
+  buildWorld();
+  state={
+    player:{x:1600,y:1210,dir:0},
+    money:0,xp:0,patience:100,coffees:3,
+    boss:{active:false,x:1600,y:1160,targetX:1600,targetY:1160,nextRemark:0},
+    message:'🕕 Zmiana rozpoczęta. Rozejrzyj się po zakładzie.',
+    interaction:null
+  };
+  faultClock=0;
+  nextFault=18;
+  updateHUD();
+  setMessage(state.message);
+}
+
+function setMessage(t){state.message=t;bubble.textContent=t}
+
+function updateHUD(){
   document.getElementById('money').textContent=state.money+' €';
-  document.getElementById('xp').textContent=state.xp+' XP';
-  document.getElementById('coffee').textContent=state.coffee;
-  document.getElementById('patience').textContent=state.patience+'%';
+  document.getElementById('xp').textContent=state.xp;
+  document.getElementById('patience').textContent=Math.round(state.patience)+'%';
+  document.getElementById('coffees').textContent=state.coffees;
+  document.getElementById('faults').textContent=machines.filter(m=>m.down).length;
 }
 
-function updateMachines(){
-  defs.forEach(m=>{
-    const g=machinesG.querySelector('[data-id="'+m.id+'"]');
-    const down=state.machines[m.id].down;
-    const r=g.querySelector('rect');
-    const s=g.querySelector('[data-status]');
-    r.setAttribute('fill',down?'#a33f3f':'#74808b');
-    r.setAttribute('stroke',down?'#761616':'#46515c');
-    s.textContent=down?'🚨 AWARIA':'✅ działa';
-    s.setAttribute('fill',down?'#fff0a8':'#effff0');
-  });
-  updateAction();
+function hallByPoint(x,y){
+  if(x>workshop.x&&x<workshop.x+workshop.w&&y>workshop.y&&y<workshop.y+workshop.h) return {name:'WARSZTAT'};
+  for(const h of halls) if(x>h.x&&x<h.x+h.w&&y>h.y&&y<h.y+h.h) return h;
+  return {name:'KORYTARZ / PLAC'};
 }
 
-function updatePlayer(){
-  player.setAttribute('transform','translate('+state.x+' '+state.y+')');
-  updateAction();
+function rectHit(x,y,r,rect){
+  return x+r>rect.x&&x-r<rect.x+rect.w&&y+r>rect.y&&y-r<rect.y+rect.h;
 }
 
-function nearestBroken(){
-  let best=null,bestD=Infinity;
-  defs.forEach(m=>{
-    if(!state.machines[m.id].down) return;
-    const d=Math.hypot(state.x-(m.x+m.w/2),state.y-(m.y+m.h/2));
-    if(d<bestD){bestD=d;best=m;}
-  });
-  return bestD<115?best:null;
-}
-
-function updateAction(){
-  const m=nearestBroken();
-  action.disabled=!m;
-  action.textContent=m?'🔧 '+m.name:'NAPRAW';
-}
-
-function downCount(){
-  return defs.filter(m=>state.machines[m.id].down).length;
-}
-
-function spawnFault(){
-  const free=defs.filter(m=>!state.machines[m.id].down);
-  if(!free.length){
-    msg.textContent='☠️ Wszystko stoi. Prezes już wie.';
-    return;
+function blocked(x,y){
+  const r=17;
+  if(x<35||y<35||x>WORLD.w-35||y>WORLD.h-35) return true;
+  for(const m of machines) if(rectHit(x,y,r,{x:m.x,y:m.y,w:m.w,h:m.h})) return true;
+  if(rectHit(x,y,r,workshop)) {
+    const doorTop=1170,doorBottom=1260;
+    if(!(x<workshop.x+35 || x>workshop.x+workshop.w-35 || (y>doorTop&&y<doorBottom))) {
+      return true;
+    }
   }
-  const m=free[Math.floor(Math.random()*free.length)];
-  const opts=faultTexts[m.id];
-  state.machines[m.id].down=true;
-  state.machines[m.id].fault=opts[Math.floor(Math.random()*opts.length)];
-  state.patience=Math.max(0,state.patience-3);
-  msg.textContent='📞 '+m.name+': '+state.machines[m.id].fault;
-  updateMachines(); updateStats();
-
-  if(downCount()>=3 && !state.boss && Math.random()<0.8){
-    state.boss=true;
-    boss.setAttribute('visibility','visible');
-    state.patience=Math.max(0,state.patience-8);
-    msg.textContent+=' 😡 PREZES: '+bossLines[Math.floor(Math.random()*bossLines.length)];
-    updateStats();
-  }
-}
-
-function repair(){
-  const m=nearestBroken();
-  if(!m){
-    msg.textContent='🔧 Podejdź bliżej do czerwonej maszyny.';
-    return;
-  }
-  const oldFault=state.machines[m.id].fault;
-  state.machines[m.id].down=false;
-  state.machines[m.id].fault='';
-  const reward=35+Math.floor(Math.random()*31);
-  state.money+=reward;
-  state.xp+=10;
-  state.patience=Math.max(0,state.patience-(state.boss?7:4));
-  msg.textContent='🔧 '+m.name+' naprawiona. '+oldFault+' '+repairs[Math.floor(Math.random()*repairs.length)]+' +'+reward+' € / +10 XP';
-
-  if(state.boss && downCount()<=1){
-    state.boss=false;
-    boss.setAttribute('visibility','hidden');
-    msg.textContent+=' 👔 Prezes poszedł denerwować kogoś innego.';
-  }
-  updateMachines(); updateStats();
-}
-
-function collides(nx,ny){
-  const r=18;
-  if(nx<25||nx>695||ny<48||ny>440) return true;
-  for(const m of defs){
-    if(nx+r>m.x&&nx-r<m.x+m.w&&ny+r>m.y&&ny-r<m.y+m.h) return true;
-  }
-  if(nx+r>520&&nx-r<685&&ny+r>335&&ny-r<435) return true;
   return false;
 }
 
-function move(dx,dy){
-  const step=17;
-  const nx=state.x+dx*step;
-  const ny=state.y+dy*step;
-  if(!collides(nx,ny)){
-    state.x=nx; state.y=ny; updatePlayer();
+function nearestEntity(){
+  const p=state.player;
+  let best=null,dist=9999,type='';
+  machines.forEach(m=>{
+    const d=Math.hypot(p.x-(m.x+m.w/2),p.y-(m.y+m.h/2));
+    if(d<dist){dist=d;best=m;type='machine'}
+  });
+  operators.forEach(o=>{
+    const d=Math.hypot(p.x-o.x,p.y-o.y);
+    if(d<dist){dist=d;best=o;type='operator'}
+  });
+  if(state.boss.active){
+    const d=Math.hypot(p.x-state.boss.x,p.y-state.boss.y);
+    if(d<dist){dist=d;best=state.boss;type='boss'}
+  }
+  return dist<105?{type,obj:best,dist}:null;
+}
+
+function spawnFault(force=false){
+  const active=machines.filter(m=>m.down).length;
+  if(active>=3&&!force) return;
+  const free=machines.filter(m=>!m.down);
+  if(!free.length) return;
+  const m=free[Math.floor(Math.random()*free.length)];
+  m.down=true;
+  m.stage=0;
+  m.fault=faultTexts[Math.floor(Math.random()*faultTexts.length)];
+  const h=halls.find(x=>x.id===m.hall);
+  setMessage('📟 ZGŁOSZENIE — '+h.name+': '+m.name+'. '+m.fault);
+  state.patience=Math.max(0,state.patience-1);
+  updateHUD();
+  if(machines.filter(x=>x.down).length>=2&&!state.boss.active) activateBoss();
+}
+
+function activateBoss(){
+  state.boss.active=true;
+  state.boss.x=1600;state.boss.y=1040;
+  state.boss.targetX=state.player.x;state.boss.targetY=state.player.y;
+  state.boss.nextRemark=5;
+  setMessage('👔 PREZES wyszedł z biura. To nigdy nie wróży nic dobrego.');
+}
+
+function interact(){
+  const e=nearestEntity();
+  if(!e){setMessage('🔧 Tu nie ma niczego, czym trzeba się teraz zajmować.');return;}
+  if(e.type==='operator'){
+    const m=machines.find(x=>x.id===e.obj.machineId);
+    if(m.down){
+      setMessage('👷 Operator przy '+m.name+': '+operatorLines[Math.floor(Math.random()*operatorLines.length)]+'  Objaw: '+m.fault);
+      if(m.stage===0)m.stage=1;
+    }else{
+      setMessage('👷 Operator: „Na razie działa. Lepiej nie zapeszać.”');
+    }
+    return;
+  }
+  if(e.type==='boss'){
+    setMessage('👔 Prezes: '+bossLines[Math.floor(Math.random()*bossLines.length)]+'  Mechanik myśli coś, czego nie wypada zapisać.');
+    state.patience=Math.max(0,state.patience-4);updateHUD();return;
+  }
+  const m=e.obj;
+  if(!m.down){setMessage('✅ '+m.name+' pracuje normalnie. Mechanik patrzy podejrzliwie.');return;}
+  if(m.stage===0){
+    m.stage=1;
+    setMessage('🔎 '+m.name+': najpierw wypada zapytać operatora albo obejrzeć objawy. Kliknij AKCJA jeszcze raz po chwili.');
+  }else if(m.stage===1){
+    m.stage=2;
+    setMessage('🧰 Diagnoza: problem znaleziony. '+m.fault+'  Jeszcze jedna AKCJA = naprawa.');
+  }else{
+    m.down=false;m.stage=0;
+    const reward=80+Math.floor(Math.random()*61);
+    state.money+=reward;state.xp+=15;
+    state.patience=Math.max(0,state.patience-3);
+    setMessage('🔧 '+m.name+' naprawiona. +'+reward+' € / +15 XP. Operator: „Aha, czyli jednak drobiazg.”');
+    if(machines.filter(x=>x.down).length===0&&state.boss.active){
+      state.boss.active=false;
+      setMessage('🔧 '+m.name+' naprawiona. Wszystkie linie chodzą. 👔 Prezes stracił zainteresowanie i zniknął.');
+    }
+    updateHUD();
   }
 }
 
 function drinkCoffee(){
-  if(state.coffee<=0){
-    msg.textContent='☕ Kawa się skończyła. To nie jest już gra, tylko dokument.';
-    return;
-  }
-  state.coffee--;
-  state.patience=Math.min(100,state.patience+25);
-  updateStats();
-  msg.textContent='☕ Kawa +25 cierpliwości. Błogi spokój...';
-  if(Math.random()<0.65){
-    setTimeout(()=>{msg.textContent='📞 DRRRRYŃ. Oczywiście dokładnie teraz.';spawnFault();},800);
-  }
+  if(state.coffees<=0){setMessage('☕ Kawa się skończyła. Sytuacja poważna.');return;}
+  const d=Math.hypot(state.player.x-(workshop.x+workshop.w/2),state.player.y-(workshop.y+workshop.h/2));
+  if(d>330){setMessage('☕ Kawa jest w warsztacie. Najpierw trzeba tam dojść.');return;}
+  state.coffees--;state.patience=Math.min(100,state.patience+22);
+  setMessage('☕ Kawa wypita. +22 cierpliwości. Przez moment świat wygląda lepiej.');
+  updateHUD();
 }
 
-function reset(){
-  if(faultTimer) clearInterval(faultTimer);
-  if(bossTimer) clearInterval(bossTimer);
-  state={x:585,y:300,money:0,xp:0,coffee:2,patience:100,boss:false,machines:{}};
-  defs.forEach(m=>state.machines[m.id]={down:false,fault:''});
-  boss.setAttribute('visibility','hidden');
-  updatePlayer(); updateMachines(); updateStats();
-  msg.textContent='🕕 Nowa zmiana. Mechanik jeszcze ma nadzieję.';
-  faultTimer=setInterval(spawnFault,5500);
-  bossTimer=setInterval(()=>{if(state.boss){state.patience=Math.max(0,state.patience-1);updateStats();}},1800);
-  setTimeout(spawnFault,1000);
-  setTimeout(spawnFault,3400);
+function update(dt){
+  const speed=210;
+  let dx=0,dy=0;
+  if(keys.ArrowUp||keys.w)dy-=1;
+  if(keys.ArrowDown||keys.s)dy+=1;
+  if(keys.ArrowLeft||keys.a)dx-=1;
+  if(keys.ArrowRight||keys.d)dx+=1;
+  if(dx||dy){
+    const l=Math.hypot(dx,dy);dx/=l;dy/=l;
+    const nx=state.player.x+dx*speed*dt;
+    const ny=state.player.y+dy*speed*dt;
+    if(!blocked(nx,state.player.y))state.player.x=nx;
+    if(!blocked(state.player.x,ny))state.player.y=ny;
+    state.player.dir=Math.atan2(dy,dx);
+  }
+
+  forklifts.forEach(f=>{
+    if(f.axis==='x'){
+      f.x+=f.vx*dt;
+      if(f.x<f.min||f.x>f.max){f.vx*=-1;f.x=Math.max(f.min,Math.min(f.max,f.x))}
+    }else{
+      f.y+=f.vy*dt;
+      if(f.y<f.min||f.y>f.max){f.vy*=-1;f.y=Math.max(f.min,Math.min(f.max,f.y))}
+    }
+  });
+
+  faultClock+=dt;
+  if(faultClock>=nextFault){
+    faultClock=0;
+    nextFault=34+Math.random()*26;
+    spawnFault(false);
+  }
+
+  if(state.boss.active){
+    const b=state.boss,p=state.player;
+    b.targetX=p.x+70;b.targetY=p.y+60;
+    const d=Math.hypot(b.targetX-b.x,b.targetY-b.y);
+    if(d>85){
+      b.x+=(b.targetX-b.x)/d*85*dt;
+      b.y+=(b.targetY-b.y)/d*85*dt;
+    }
+    b.nextRemark-=dt;
+    if(b.nextRemark<=0&&Math.hypot(p.x-b.x,p.y-b.y)<230){
+      b.nextRemark=9+Math.random()*6;
+      state.patience=Math.max(0,state.patience-2);
+      setMessage('👔 Prezes: '+bossLines[Math.floor(Math.random()*bossLines.length)]+'  😤 -2 cierpliwości.');
+      updateHUD();
+    }
+  }
+
+  zoneEl.textContent='📍 '+hallByPoint(state.player.x,state.player.y).name;
+  const near=nearestEntity();
+  if(near){
+    interactBtn.textContent=near.type==='machine'?'🔧 MASZYNA':near.type==='operator'?'💬 OPERATOR':'💬 PREZES';
+  }else interactBtn.textContent='AKCJA';
 }
 
-document.querySelectorAll('[data-dir]').forEach(btn=>{
-  const dirs={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]};
-  btn.addEventListener('click',()=>{const d=dirs[btn.dataset.dir];move(d[0],d[1]);});
-});
+function worldToScreen(x,y,cam){return {x:x-cam.x,y:y-cam.y}}
+
+function drawPerson(x,y,kind,cam,mood=0){
+  const s=worldToScreen(x,y,cam);
+  if(s.x<-50||s.y<-70||s.x>canvas.width+50||s.y>canvas.height+70)return;
+  ctx.save();ctx.translate(s.x,s.y);
+  if(kind==='player'){
+    ctx.fillStyle='#283947';ctx.fillRect(-15,16,30,30);
+    ctx.fillStyle='#634738';ctx.beginPath();ctx.ellipse(0,32,22,17,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#efc08c';ctx.beginPath();ctx.arc(0,0,16,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#222';ctx.beginPath();ctx.arc(-5,-3,2,0,7);ctx.arc(5,-3,2,0,7);ctx.fill();
+    ctx.strokeStyle='#222';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,4,6,0.25,2.9);ctx.stroke();
+    ctx.fillStyle='#333';ctx.fillRect(-18,45,12,14);ctx.fillRect(6,45,12,14);
+  }else if(kind==='operator'){
+    ctx.fillStyle=mood===0?'#4f6f8f':mood===1?'#6c7f56':'#826252';
+    ctx.fillRect(-12,13,24,30);
+    ctx.fillStyle='#e9bb8d';ctx.beginPath();ctx.arc(0,0,13,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#222';ctx.beginPath();ctx.arc(-4,-2,1.6,0,7);ctx.arc(4,-2,1.6,0,7);ctx.fill();
+    ctx.fillStyle='#222';ctx.fillRect(-12,43,9,12);ctx.fillRect(3,43,9,12);
+  }else{
+    ctx.fillStyle='#222';ctx.fillRect(-14,14,28,31);
+    ctx.fillStyle='#e7b77f';ctx.beginPath();ctx.arc(0,0,14,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#7a1010';ctx.fillRect(-16,45,32,5);
+    ctx.fillStyle='#b00';ctx.font='bold 12px Arial';ctx.fillText('PREZES',-23,68);
+  }
+  ctx.restore();
+}
+
+function drawMachine(m,cam){
+  const s=worldToScreen(m.x,m.y,cam);
+  if(s.x+m.w<0||s.y+m.h<0||s.x>canvas.width||s.y>canvas.height)return;
+  ctx.fillStyle=m.down?'#a54242':'#687b86';
+  ctx.strokeStyle=m.down?'#721616':'#3e505a';
+  ctx.lineWidth=3;
+  roundRect(s.x,s.y,m.w,m.h,10,true,true);
+  ctx.fillStyle='#fff';ctx.font='bold 15px Arial';ctx.textAlign='center';ctx.fillText(m.name,s.x+m.w/2,s.y+32);
+  ctx.font='12px Arial';ctx.fillStyle=m.down?'#fff2a8':'#dff4df';ctx.fillText(m.down?'🚨 AWARIA':'✅ działa',s.x+m.w/2,s.y+57);
+  ctx.textAlign='left';
+}
+
+function roundRect(x,y,w,h,r,fill,stroke){
+  ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();
+  if(fill)ctx.fill();if(stroke)ctx.stroke();
+}
+
+function draw(){
+  const p=state.player;
+  const cam={x:Math.max(0,Math.min(WORLD.w-canvas.width,p.x-canvas.width/2)),y:Math.max(0,Math.min(WORLD.h-canvas.height,p.y-canvas.height/2))};
+
+  ctx.fillStyle='#c3c7c9';ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  ctx.save();ctx.translate(-cam.x,-cam.y);
+  ctx.strokeStyle='#aeb3b6';ctx.lineWidth=1;
+  for(let x=0;x<WORLD.w;x+=80){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,WORLD.h);ctx.stroke()}
+  for(let y=0;y<WORLD.h;y+=80){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(WORLD.w,y);ctx.stroke()}
+
+  halls.forEach(h=>{
+    ctx.fillStyle=h.fill;ctx.strokeStyle=h.accent;ctx.lineWidth=8;roundRect(h.x,h.y,h.w,h.h,22,true,true);
+    ctx.fillStyle='rgba(255,255,255,.78)';ctx.font='bold 30px Arial';ctx.fillText(h.name,h.x+28,h.y+48);
+    ctx.fillStyle='rgba(255,255,255,.14)';
+    for(let x=h.x+40;x<h.x+h.w-40;x+=190){ctx.fillRect(x,h.y+85,95,h.h-125)}
+  });
+
+  ctx.fillStyle='#746857';ctx.strokeStyle='#4b4338';ctx.lineWidth=6;roundRect(workshop.x,workshop.y,workshop.w,workshop.h,18,true,true);
+  ctx.fillStyle='#fff';ctx.font='bold 27px Arial';ctx.fillText('WARSZTAT 🔧 ☕',workshop.x+105,workshop.y+45);
+  ctx.fillStyle='#4b4338';ctx.fillRect(workshop.x+75,workshop.y+95,130,54);ctx.fillRect(workshop.x+245,workshop.y+95,130,54);
+  ctx.fillStyle='#d7b46a';ctx.fillRect(workshop.x+75,workshop.y+205,300,58);
+  ctx.fillStyle='#fff';ctx.font='14px Arial';ctx.fillText('stół roboczy / części / kawa',workshop.x+112,workshop.y+240);
+
+  // corridors
+  ctx.fillStyle='#9da3a6';
+  ctx.fillRect(1460,770,280,240);
+  ctx.fillRect(1060,1110,310,180);
+  ctx.fillRect(1830,1110,310,180);
+  ctx.fillRect(1460,1390,280,350);
+
+  machines.forEach(m=>drawMachine(m,cam));
+  operators.forEach(o=>drawPerson(o.x,o.y,'operator',cam,o.mood));
+  forklifts.forEach(f=>{
+    const s=worldToScreen(f.x,f.y,cam);
+    ctx.font='38px Arial';ctx.fillText('🚜',s.x,s.y);
+  });
+  drawPerson(state.player.x,state.player.y,'player',cam);
+  if(state.boss.active)drawPerson(state.boss.x,state.boss.y,'boss',cam);
+  ctx.restore();
+
+  // minimap
+  const mw=165,mh=120,mx=canvas.width-mw-12,my=12;
+  ctx.fillStyle='rgba(20,23,28,.82)';roundRect(mx,my,mw,mh,9,true,false);
+  halls.forEach(h=>{
+    ctx.fillStyle=h.fill;
+    ctx.fillRect(mx+h.x/WORLD.w*mw,my+h.y/WORLD.h*mh,h.w/WORLD.w*mw,h.h/WORLD.h*mh);
+  });
+  ctx.fillStyle='#f5d35b';ctx.fillRect(mx+workshop.x/WORLD.w*mw,my+workshop.y/WORLD.h*mh,workshop.w/WORLD.w*mw,workshop.h/WORLD.h*mh);
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(mx+state.player.x/WORLD.w*mw,my+state.player.y/WORLD.h*mh,3,0,Math.PI*2);ctx.fill();
+  machines.filter(m=>m.down).forEach(m=>{
+    ctx.fillStyle='#ff4d4d';ctx.fillRect(mx+m.x/WORLD.w*mw-2,my+m.y/WORLD.h*mh-2,5,5);
+  });
+}
+
+function loop(now){
+  const dt=Math.min(.04,(now-last)/1000);last=now;
+  update(dt);draw();
+  requestAnimationFrame(loop);
+}
 
 document.addEventListener('keydown',e=>{
   const k=e.key.toLowerCase();
-  const map={arrowup:[0,-1],w:[0,-1],arrowdown:[0,1],s:[0,1],arrowleft:[-1,0],a:[-1,0],arrowright:[1,0],d:[1,0]};
-  if(map[k]){e.preventDefault();move(map[k][0],map[k][1]);}
-  if(k===' '||k==='enter'){e.preventDefault();repair();}
+  if(['arrowup','arrowdown','arrowleft','arrowright','w','a','s','d',' ','enter'].includes(k))e.preventDefault();
+  if(k===' '||k==='enter'){if(!e.repeat)interact();return;}
+  keys[k]=true;
 });
+document.addEventListener('keyup',e=>{keys[e.key.toLowerCase()]=false});
 
-action.addEventListener('click',repair);
-document.getElementById('coffeeBtn').addEventListener('click',drinkCoffee);
-document.getElementById('faultBtn').addEventListener('click',spawnFault);
-document.getElementById('restart').addEventListener('click',reset);
+const dirMap={up:'ArrowUp',down:'ArrowDown',left:'ArrowLeft',right:'ArrowRight'};
+document.querySelectorAll('[data-dir]').forEach(btn=>{
+  const k=dirMap[btn.dataset.dir];
+  const on=e=>{e.preventDefault();keys[k]=true};
+  const off=e=>{e.preventDefault();keys[k]=false};
+  btn.addEventListener('pointerdown',on);
+  btn.addEventListener('pointerup',off);
+  btn.addEventListener('pointercancel',off);
+  btn.addEventListener('pointerleave',off);
+});
+interactBtn.addEventListener('click',interact);
+document.getElementById('coffee').addEventListener('click',drinkCoffee);
+document.getElementById('fault').addEventListener('click',()=>spawnFault(true));
+document.getElementById('reset').addEventListener('click',reset);
 
 reset();
+requestAnimationFrame(t=>{last=t;requestAnimationFrame(loop)});
 })();
 </script>
 </body>

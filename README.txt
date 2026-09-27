@@ -1,23 +1,24 @@
-AGROS MAINTENANCE WARRIOR — szybkie uruchomienie
+AGROS MAINTENANCE WARRIOR — CONCEPT DEMO 0.3
 
-NAJPROŚCIEJ: NETLIFY DROP
-1. Rozpakuj plik ZIP.
-2. Wejdź na https://app.netlify.com/drop
-3. Przeciągnij CAŁY folder agros_maintenance_warrior_web na pole uploadu.
-4. Po chwili dostaniesz publiczny link w formacie ...netlify.app.
-5. Ten link otwierasz na telefonie i wysyłasz chłopakom.
+To jest prototyp koncepcji dużego świata:
+- centralny warsztat,
+- Hala Kapusta,
+- Hala Brokuł,
+- Hala Rzodkiewka,
+- Hala Cebula,
+- 32 maszyny,
+- operatorzy jako postacie,
+- ruchome wózki,
+- Prezes jako chodzący NPC,
+- spokojniejsze tempo awarii,
+- minimapa,
+- kamera podążająca za mechanikiem.
 
-W folderze:
-- index.html — cała gra
-- .nojekyll — plik pomocniczy dla GitHub Pages
+Aby zaktualizować GitHub Pages:
+1. W repozytorium podmień dotychczasowy index.html na ten plik.
+2. Commit changes.
+3. Po krótkiej chwili odśwież swój dotychczasowy link GitHub Pages.
 
-GITHUB PAGES
-GitHub wymaga konta.
-Po założeniu konta:
-1. Utwórz nowe publiczne repozytorium, np. agros-maintenance-warrior.
-2. Wgraj index.html i .nojekyll.
-3. Settings > Pages.
-4. Wybierz publikację z gałęzi main / root.
-5. GitHub pokaże adres strony.
-
-Wersja: DEMO
+Sterowanie:
+PC: WASD / strzałki, Spacja/Enter = akcja
+Telefon: przyciski ekranowe
