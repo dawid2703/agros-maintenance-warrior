@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
 <meta name="theme-color" content="#171a1f">
-<title>Agros Maintenance Warrior — Concept Demo</title>
+<title>Agros Maintenance Warrior — Concept Demo v4</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#171a1f;color:#f5f5f5;font-family:Arial,Helvetica,sans-serif}
-.wrap{max-width:1100px;margin:auto;padding:10px}
+.wrap{max-width:1100px;margin:auto;padding:8px}
 h1{text-align:center;font-size:22px;margin:4px 0}
 .sub{text-align:center;color:#b8c0ca;font-size:13px;margin:2px 0 9px}
 .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:8px}
@@ -16,8 +16,8 @@ h1{text-align:center;font-size:22px;margin:4px 0}
 .stat b{display:block;font-size:16px;margin-top:2px}
 .gamebox{position:relative;border:3px solid #414851;border-radius:13px;overflow:hidden;background:#0f1114}
 canvas{display:block;width:100%;height:auto;background:#bfc3c6;touch-action:none}
-.badge{position:absolute;left:8px;top:8px;background:rgba(20,23,28,.86);padding:6px 8px;border-radius:8px;font-size:12px;pointer-events:none}
-#bubble{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);width:min(92%,720px);background:rgba(24,27,32,.94);border:1px solid #5b6570;border-radius:10px;padding:9px 12px;font-size:13px;line-height:1.35;min-height:38px}
+.badge{position:absolute;left:8px;top:8px;background:rgba(20,23,28,.88);padding:6px 8px;border-radius:8px;font-size:12px;pointer-events:none}
+#bubble{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);width:min(92%,720px);background:rgba(24,27,32,.95);border:1px solid #5b6570;border-radius:10px;padding:9px 12px;font-size:13px;line-height:1.35;min-height:38px}
 .controls{display:grid;grid-template-columns:230px 1fr;gap:10px;margin-top:9px;align-items:start}
 .dpad{display:grid;grid-template-columns:repeat(3,68px);gap:6px;justify-content:center}
 .dpad button,.actions button{min-height:52px;border:0;border-radius:10px;font-weight:bold;font-size:17px;touch-action:manipulation;cursor:pointer}
@@ -41,7 +41,7 @@ canvas{display:block;width:100%;height:auto;background:#bfc3c6;touch-action:none
 <body>
 <div class="wrap">
   <h1>🔧 AGROS MAINTENANCE WARRIOR</h1>
-  <div class="sub">Concept Demo 0.3 — duży zakład, 4 hale, operatorzy, Prezes i spokojniejsze tempo</div>
+  <div class="sub">Concept Demo 0.4 — poprawiona kamera i widoczne postacie</div>
 
   <div class="stats">
     <div class="stat">💰 Kasa<b id="money">0 €</b></div>
@@ -71,7 +71,7 @@ canvas{display:block;width:100%;height:auto;background:#bfc3c6;touch-action:none
       </div>
       <div class="legend">
         PC: WASD / strzałki • Spacja / Enter = akcja. Telefon: przyciski kierunkowe.<br>
-        Awarii jest mało. Masz czas dojść do hali, pogadać z operatorem i obejrzeć maszynę.
+        Mechanik ma żółtą strzałkę nad głową. Operatorzy stoją przy swoich maszynach.
       </div>
     </div>
   </div>
@@ -157,12 +157,9 @@ function buildWorld(){
       operators.push({
         id:'op-'+m.id,
         machineId:m.id,
-        x:p[0]-38,
+        x:p[0]-42,
         y:p[1]+48,
-        homeX:p[0]-38,
-        homeY:p[1]+48,
-        mood:i%3,
-        facing:1
+        mood:i%3
       });
     });
   });
@@ -176,14 +173,13 @@ function buildWorld(){
 function reset(){
   buildWorld();
   state={
-    player:{x:1600,y:1210,dir:0},
+    player:{x:1600,y:1500,dir:0},
     money:0,xp:0,patience:100,coffees:3,
-    boss:{active:false,x:1600,y:1160,targetX:1600,targetY:1160,nextRemark:0},
-    message:'🕕 Zmiana rozpoczęta. Rozejrzyj się po zakładzie.',
-    interaction:null
+    boss:{active:false,x:1600,y:1060,targetX:1600,targetY:1060,nextRemark:0},
+    message:'🕕 Zmiana rozpoczęta. Mechanik jest na placu przed warsztatem.'
   };
   faultClock=0;
-  nextFault=18;
+  nextFault=20;
   updateHUD();
   setMessage(state.message);
 }
@@ -209,15 +205,9 @@ function rectHit(x,y,r,rect){
 }
 
 function blocked(x,y){
-  const r=17;
+  const r=18;
   if(x<35||y<35||x>WORLD.w-35||y>WORLD.h-35) return true;
   for(const m of machines) if(rectHit(x,y,r,{x:m.x,y:m.y,w:m.w,h:m.h})) return true;
-  if(rectHit(x,y,r,workshop)) {
-    const doorTop=1170,doorBottom=1260;
-    if(!(x<workshop.x+35 || x>workshop.x+workshop.w-35 || (y>doorTop&&y<doorBottom))) {
-      return true;
-    }
-  }
   return false;
 }
 
@@ -236,7 +226,7 @@ function nearestEntity(){
     const d=Math.hypot(p.x-state.boss.x,p.y-state.boss.y);
     if(d<dist){dist=d;best=state.boss;type='boss'}
   }
-  return dist<105?{type,obj:best,dist}:null;
+  return dist<115?{type,obj:best,dist}:null;
 }
 
 function spawnFault(force=false){
@@ -269,7 +259,7 @@ function interact(){
   if(e.type==='operator'){
     const m=machines.find(x=>x.id===e.obj.machineId);
     if(m.down){
-      setMessage('👷 Operator przy '+m.name+': '+operatorLines[Math.floor(Math.random()*operatorLines.length)]+'  Objaw: '+m.fault);
+      setMessage('👷 Operator przy '+m.name+': '+operatorLines[Math.floor(Math.random()*operatorLines.length)]+' Objaw: '+m.fault);
       if(m.stage===0)m.stage=1;
     }else{
       setMessage('👷 Operator: „Na razie działa. Lepiej nie zapeszać.”');
@@ -277,17 +267,17 @@ function interact(){
     return;
   }
   if(e.type==='boss'){
-    setMessage('👔 Prezes: '+bossLines[Math.floor(Math.random()*bossLines.length)]+'  Mechanik myśli coś, czego nie wypada zapisać.');
+    setMessage('👔 Prezes: '+bossLines[Math.floor(Math.random()*bossLines.length)]+' Mechanik myśli coś, czego lepiej nie wpisywać.');
     state.patience=Math.max(0,state.patience-4);updateHUD();return;
   }
   const m=e.obj;
   if(!m.down){setMessage('✅ '+m.name+' pracuje normalnie. Mechanik patrzy podejrzliwie.');return;}
   if(m.stage===0){
     m.stage=1;
-    setMessage('🔎 '+m.name+': najpierw wypada zapytać operatora albo obejrzeć objawy. Kliknij AKCJA jeszcze raz po chwili.');
+    setMessage('🔎 '+m.name+': szybkie oględziny. Jeszcze jedna AKCJA = diagnoza.');
   }else if(m.stage===1){
     m.stage=2;
-    setMessage('🧰 Diagnoza: problem znaleziony. '+m.fault+'  Jeszcze jedna AKCJA = naprawa.');
+    setMessage('🧰 Diagnoza: problem znaleziony. '+m.fault+' Jeszcze jedna AKCJA = naprawa.');
   }else{
     m.down=false;m.stage=0;
     const reward=80+Math.floor(Math.random()*61);
@@ -296,23 +286,23 @@ function interact(){
     setMessage('🔧 '+m.name+' naprawiona. +'+reward+' € / +15 XP. Operator: „Aha, czyli jednak drobiazg.”');
     if(machines.filter(x=>x.down).length===0&&state.boss.active){
       state.boss.active=false;
-      setMessage('🔧 '+m.name+' naprawiona. Wszystkie linie chodzą. 👔 Prezes stracił zainteresowanie i zniknął.');
+      setMessage('🔧 '+m.name+' naprawiona. Wszystkie linie chodzą. 👔 Prezes stracił zainteresowanie.');
     }
     updateHUD();
   }
 }
 
 function drinkCoffee(){
-  if(state.coffees<=0){setMessage('☕ Kawa się skończyła. Sytuacja poważna.');return;}
-  const d=Math.hypot(state.player.x-(workshop.x+workshop.w/2),state.player.y-(workshop.y+workshop.h/2));
-  if(d>330){setMessage('☕ Kawa jest w warsztacie. Najpierw trzeba tam dojść.');return;}
+  const cx=workshop.x+workshop.w/2,cy=workshop.y+workshop.h/2;
+  if(Math.hypot(state.player.x-cx,state.player.y-cy)>420){setMessage('☕ Kawa została w warsztacie. Trzeba wrócić.');return;}
+  if(state.coffees<=0){setMessage('☕ Kawa się skończyła. To już poważna awaria.');return;}
   state.coffees--;state.patience=Math.min(100,state.patience+22);
-  setMessage('☕ Kawa wypita. +22 cierpliwości. Przez moment świat wygląda lepiej.');
+  setMessage('☕ Kawa wypita. +22 cierpliwości.');
   updateHUD();
 }
 
 function update(dt){
-  const speed=210;
+  const speed=230;
   let dx=0,dy=0;
   if(keys.ArrowUp||keys.w)dy-=1;
   if(keys.ArrowDown||keys.s)dy+=1;
@@ -340,102 +330,126 @@ function update(dt){
   faultClock+=dt;
   if(faultClock>=nextFault){
     faultClock=0;
-    nextFault=34+Math.random()*26;
+    nextFault=38+Math.random()*28;
     spawnFault(false);
   }
 
   if(state.boss.active){
     const b=state.boss,p=state.player;
-    b.targetX=p.x+70;b.targetY=p.y+60;
-    const d=Math.hypot(b.targetX-b.x,b.targetY-b.y);
-    if(d>85){
-      b.x+=(b.targetX-b.x)/d*85*dt;
-      b.y+=(b.targetY-b.y)/d*85*dt;
+    const tx=p.x+85,ty=p.y+65;
+    const d=Math.hypot(tx-b.x,ty-b.y);
+    if(d>105){
+      b.x+=(tx-b.x)/d*90*dt;
+      b.y+=(ty-b.y)/d*90*dt;
     }
     b.nextRemark-=dt;
-    if(b.nextRemark<=0&&Math.hypot(p.x-b.x,p.y-b.y)<230){
-      b.nextRemark=9+Math.random()*6;
+    if(b.nextRemark<=0&&Math.hypot(p.x-b.x,p.y-b.y)<260){
+      b.nextRemark=10+Math.random()*7;
       state.patience=Math.max(0,state.patience-2);
-      setMessage('👔 Prezes: '+bossLines[Math.floor(Math.random()*bossLines.length)]+'  😤 -2 cierpliwości.');
+      setMessage('👔 Prezes: '+bossLines[Math.floor(Math.random()*bossLines.length)]+' 😤 -2 cierpliwości.');
       updateHUD();
     }
   }
 
   zoneEl.textContent='📍 '+hallByPoint(state.player.x,state.player.y).name;
   const near=nearestEntity();
-  if(near){
-    interactBtn.textContent=near.type==='machine'?'🔧 MASZYNA':near.type==='operator'?'💬 OPERATOR':'💬 PREZES';
-  }else interactBtn.textContent='AKCJA';
+  interactBtn.textContent=near?(near.type==='machine'?'🔧 MASZYNA':near.type==='operator'?'💬 OPERATOR':'💬 PREZES'):'AKCJA';
 }
 
-function worldToScreen(x,y,cam){return {x:x-cam.x,y:y-cam.y}}
+function roundRectWorld(x,y,w,h,r,fill,stroke){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+  if(fill)ctx.fill();
+  if(stroke)ctx.stroke();
+}
 
-function drawPerson(x,y,kind,cam,mood=0){
-  const s=worldToScreen(x,y,cam);
-  if(s.x<-50||s.y<-70||s.x>canvas.width+50||s.y>canvas.height+70)return;
-  ctx.save();ctx.translate(s.x,s.y);
+function drawPersonWorld(x,y,kind,mood=0){
+  ctx.save();
+  ctx.translate(x,y);
   if(kind==='player'){
-    ctx.fillStyle='#283947';ctx.fillRect(-15,16,30,30);
-    ctx.fillStyle='#634738';ctx.beginPath();ctx.ellipse(0,32,22,17,0,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#efc08c';ctx.beginPath();ctx.arc(0,0,16,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#222';ctx.beginPath();ctx.arc(-5,-3,2,0,7);ctx.arc(5,-3,2,0,7);ctx.fill();
-    ctx.strokeStyle='#222';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,4,6,0.25,2.9);ctx.stroke();
-    ctx.fillStyle='#333';ctx.fillRect(-18,45,12,14);ctx.fillRect(6,45,12,14);
+    // yellow marker
+    ctx.fillStyle='#ffd43b';
+    ctx.beginPath();ctx.moveTo(0,-48);ctx.lineTo(-13,-68);ctx.lineTo(13,-68);ctx.closePath();ctx.fill();
+    ctx.strokeStyle='#7a6411';ctx.lineWidth=2;ctx.stroke();
+
+    // shadow
+    ctx.fillStyle='rgba(0,0,0,.18)';
+    ctx.beginPath();ctx.ellipse(0,54,27,10,0,0,Math.PI*2);ctx.fill();
+
+    // legs
+    ctx.fillStyle='#2d343a';
+    ctx.fillRect(-18,38,13,22);ctx.fillRect(5,38,13,22);
+
+    // big belly/torso
+    ctx.fillStyle='#3e5968';
+    ctx.beginPath();ctx.ellipse(0,28,30,27,0,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='#26343d';ctx.lineWidth=3;ctx.stroke();
+
+    // head
+    ctx.fillStyle='#efc08c';ctx.beginPath();ctx.arc(0,-5,21,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#333';ctx.lineWidth=2;ctx.stroke();
+    ctx.fillStyle='#222';ctx.beginPath();ctx.arc(-7,-8,2.7,0,Math.PI*2);ctx.arc(7,-8,2.7,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='#222';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,8,.2,2.95);ctx.stroke();
+
+    // wrench
+    ctx.strokeStyle='#d9dde0';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(25,18);ctx.lineTo(39,2);ctx.stroke();
+    ctx.fillStyle='#111';ctx.font='bold 12px Arial';ctx.textAlign='center';ctx.fillText('TY',0,78);
   }else if(kind==='operator'){
+    ctx.fillStyle='rgba(0,0,0,.14)';ctx.beginPath();ctx.ellipse(0,43,16,7,0,0,Math.PI*2);ctx.fill();
     ctx.fillStyle=mood===0?'#4f6f8f':mood===1?'#6c7f56':'#826252';
-    ctx.fillRect(-12,13,24,30);
-    ctx.fillStyle='#e9bb8d';ctx.beginPath();ctx.arc(0,0,13,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#222';ctx.beginPath();ctx.arc(-4,-2,1.6,0,7);ctx.arc(4,-2,1.6,0,7);ctx.fill();
-    ctx.fillStyle='#222';ctx.fillRect(-12,43,9,12);ctx.fillRect(3,43,9,12);
+    ctx.fillRect(-13,10,26,34);
+    ctx.fillStyle='#e9bb8d';ctx.beginPath();ctx.arc(0,-5,14,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#222';ctx.beginPath();ctx.arc(-4,-7,1.8,0,7);ctx.arc(4,-7,1.8,0,7);ctx.fill();
+    ctx.fillStyle='#222';ctx.fillRect(-12,44,9,14);ctx.fillRect(3,44,9,14);
   }else{
-    ctx.fillStyle='#222';ctx.fillRect(-14,14,28,31);
-    ctx.fillStyle='#e7b77f';ctx.beginPath();ctx.arc(0,0,14,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#7a1010';ctx.fillRect(-16,45,32,5);
-    ctx.fillStyle='#b00';ctx.font='bold 12px Arial';ctx.fillText('PREZES',-23,68);
+    ctx.fillStyle='rgba(0,0,0,.15)';ctx.beginPath();ctx.ellipse(0,45,18,7,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#1f2326';ctx.fillRect(-15,10,30,36);
+    ctx.fillStyle='#e7b77f';ctx.beginPath();ctx.arc(0,-6,15,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#c0392b';ctx.beginPath();ctx.arc(-5,-8,2,0,7);ctx.arc(5,-8,2,0,7);ctx.fill();
+    ctx.fillStyle='#8b0000';ctx.font='bold 12px Arial';ctx.textAlign='center';ctx.fillText('PREZES',0,68);
   }
   ctx.restore();
-}
-
-function drawMachine(m,cam){
-  const s=worldToScreen(m.x,m.y,cam);
-  if(s.x+m.w<0||s.y+m.h<0||s.x>canvas.width||s.y>canvas.height)return;
-  ctx.fillStyle=m.down?'#a54242':'#687b86';
-  ctx.strokeStyle=m.down?'#721616':'#3e505a';
-  ctx.lineWidth=3;
-  roundRect(s.x,s.y,m.w,m.h,10,true,true);
-  ctx.fillStyle='#fff';ctx.font='bold 15px Arial';ctx.textAlign='center';ctx.fillText(m.name,s.x+m.w/2,s.y+32);
-  ctx.font='12px Arial';ctx.fillStyle=m.down?'#fff2a8':'#dff4df';ctx.fillText(m.down?'🚨 AWARIA':'✅ działa',s.x+m.w/2,s.y+57);
   ctx.textAlign='left';
 }
 
-function roundRect(x,y,w,h,r,fill,stroke){
-  ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();
-  if(fill)ctx.fill();if(stroke)ctx.stroke();
+function drawMachineWorld(m){
+  ctx.fillStyle=m.down?'#a54242':'#687b86';
+  ctx.strokeStyle=m.down?'#721616':'#3e505a';
+  ctx.lineWidth=3;
+  roundRectWorld(m.x,m.y,m.w,m.h,10,true,true);
+  ctx.fillStyle='#fff';ctx.font='bold 15px Arial';ctx.textAlign='center';ctx.fillText(m.name,m.x+m.w/2,m.y+32);
+  ctx.font='12px Arial';ctx.fillStyle=m.down?'#fff2a8':'#dff4df';ctx.fillText(m.down?'🚨 AWARIA':'✅ działa',m.x+m.w/2,m.y+57);
+  ctx.textAlign='left';
 }
 
 function draw(){
   const p=state.player;
-  const cam={x:Math.max(0,Math.min(WORLD.w-canvas.width,p.x-canvas.width/2)),y:Math.max(0,Math.min(WORLD.h-canvas.height,p.y-canvas.height/2))};
+  const cam={
+    x:Math.max(0,Math.min(WORLD.w-canvas.width,p.x-canvas.width/2)),
+    y:Math.max(0,Math.min(WORLD.h-canvas.height,p.y-canvas.height/2))
+  };
 
   ctx.fillStyle='#c3c7c9';ctx.fillRect(0,0,canvas.width,canvas.height);
 
-  ctx.save();ctx.translate(-cam.x,-cam.y);
+  ctx.save();
+  ctx.translate(-cam.x,-cam.y);
+
+  // grid
   ctx.strokeStyle='#aeb3b6';ctx.lineWidth=1;
   for(let x=0;x<WORLD.w;x+=80){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,WORLD.h);ctx.stroke()}
   for(let y=0;y<WORLD.h;y+=80){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(WORLD.w,y);ctx.stroke()}
 
+  // halls
   halls.forEach(h=>{
-    ctx.fillStyle=h.fill;ctx.strokeStyle=h.accent;ctx.lineWidth=8;roundRect(h.x,h.y,h.w,h.h,22,true,true);
-    ctx.fillStyle='rgba(255,255,255,.78)';ctx.font='bold 30px Arial';ctx.fillText(h.name,h.x+28,h.y+48);
-    ctx.fillStyle='rgba(255,255,255,.14)';
-    for(let x=h.x+40;x<h.x+h.w-40;x+=190){ctx.fillRect(x,h.y+85,95,h.h-125)}
+    ctx.fillStyle=h.fill;ctx.strokeStyle=h.accent;ctx.lineWidth=8;roundRectWorld(h.x,h.y,h.w,h.h,22,true,true);
+    ctx.fillStyle='rgba(255,255,255,.85)';ctx.font='bold 30px Arial';ctx.fillText(h.name,h.x+28,h.y+48);
+    ctx.fillStyle='rgba(255,255,255,.11)';
+    for(let x=h.x+40;x<h.x+h.w-40;x+=190)ctx.fillRect(x,h.y+85,95,h.h-125);
   });
-
-  ctx.fillStyle='#746857';ctx.strokeStyle='#4b4338';ctx.lineWidth=6;roundRect(workshop.x,workshop.y,workshop.w,workshop.h,18,true,true);
-  ctx.fillStyle='#fff';ctx.font='bold 27px Arial';ctx.fillText('WARSZTAT 🔧 ☕',workshop.x+105,workshop.y+45);
-  ctx.fillStyle='#4b4338';ctx.fillRect(workshop.x+75,workshop.y+95,130,54);ctx.fillRect(workshop.x+245,workshop.y+95,130,54);
-  ctx.fillStyle='#d7b46a';ctx.fillRect(workshop.x+75,workshop.y+205,300,58);
-  ctx.fillStyle='#fff';ctx.font='14px Arial';ctx.fillText('stół roboczy / części / kawa',workshop.x+112,workshop.y+240);
 
   // corridors
   ctx.fillStyle='#9da3a6';
@@ -444,25 +458,35 @@ function draw(){
   ctx.fillRect(1830,1110,310,180);
   ctx.fillRect(1460,1390,280,350);
 
-  machines.forEach(m=>drawMachine(m,cam));
-  operators.forEach(o=>drawPerson(o.x,o.y,'operator',cam,o.mood));
+  // workshop
+  ctx.fillStyle='#746857';ctx.strokeStyle='#4b4338';ctx.lineWidth=6;roundRectWorld(workshop.x,workshop.y,workshop.w,workshop.h,18,true,true);
+  ctx.fillStyle='#fff';ctx.font='bold 27px Arial';ctx.fillText('WARSZTAT 🔧 ☕',workshop.x+105,workshop.y+45);
+  ctx.fillStyle='#4b4338';ctx.fillRect(workshop.x+75,workshop.y+95,130,54);ctx.fillRect(workshop.x+245,workshop.y+95,130,54);
+  ctx.fillStyle='#d7b46a';ctx.fillRect(workshop.x+75,workshop.y+205,300,58);
+  ctx.fillStyle='#fff';ctx.font='14px Arial';ctx.fillText('stół roboczy / części / kawa',workshop.x+112,workshop.y+240);
+
+  machines.forEach(drawMachineWorld);
+  operators.forEach(o=>drawPersonWorld(o.x,o.y,'operator',o.mood));
+
   forklifts.forEach(f=>{
-    const s=worldToScreen(f.x,f.y,cam);
-    ctx.font='38px Arial';ctx.fillText('🚜',s.x,s.y);
+    ctx.font='42px Arial';
+    ctx.fillText('🚜',f.x,f.y);
   });
-  drawPerson(state.player.x,state.player.y,'player',cam);
-  if(state.boss.active)drawPerson(state.boss.x,state.boss.y,'boss',cam);
+
+  if(state.boss.active) drawPersonWorld(state.boss.x,state.boss.y,'boss');
+  drawPersonWorld(state.player.x,state.player.y,'player');
+
   ctx.restore();
 
-  // minimap
+  // minimap (screen coordinates)
   const mw=165,mh=120,mx=canvas.width-mw-12,my=12;
-  ctx.fillStyle='rgba(20,23,28,.82)';roundRect(mx,my,mw,mh,9,true,false);
+  ctx.fillStyle='rgba(20,23,28,.85)';roundRectWorld(mx,my,mw,mh,9,true,false);
   halls.forEach(h=>{
     ctx.fillStyle=h.fill;
     ctx.fillRect(mx+h.x/WORLD.w*mw,my+h.y/WORLD.h*mh,h.w/WORLD.w*mw,h.h/WORLD.h*mh);
   });
   ctx.fillStyle='#f5d35b';ctx.fillRect(mx+workshop.x/WORLD.w*mw,my+workshop.y/WORLD.h*mh,workshop.w/WORLD.w*mw,workshop.h/WORLD.h*mh);
-  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(mx+state.player.x/WORLD.w*mw,my+state.player.y/WORLD.h*mh,3,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(mx+state.player.x/WORLD.w*mw,my+state.player.y/WORLD.h*mh,4,0,Math.PI*2);ctx.fill();
   machines.filter(m=>m.down).forEach(m=>{
     ctx.fillStyle='#ff4d4d';ctx.fillRect(mx+m.x/WORLD.w*mw-2,my+m.y/WORLD.h*mh-2,5,5);
   });
